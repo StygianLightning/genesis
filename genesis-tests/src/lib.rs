@@ -22,7 +22,7 @@ struct Template {
     positions: Position,
     names: NameComponent,
     #[component(map)]
-    data: RareComponent,
+    rare_data: RareComponent,
 }
 
 #[cfg(test)]
@@ -86,6 +86,49 @@ mod tests {
 
         world.clear();
         assert_eq!(world.names.get(id_b), None);
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_template() -> Result<(), NoSuchEntity> {
+        let mut world = World::new(3);
+        let id = world.spawn();
+
+        let template = Template {
+            positions: Some(Position { position: (10, 20) }),
+            rare_data: Some(RareComponent { data: 42 }),
+            ..Default::default()
+        };
+
+        // run with cargo test -- --nocapture to see Debug output
+        println!("template: {:?}", template);
+
+        assert_eq!(
+            template,
+            Template {
+                positions: Some(Position { position: (10, 20) }),
+                names: None,
+                rare_data: Some(RareComponent { data: 42 }),
+            }
+        );
+
+        let old_data_registered = world.register(id, template)?;
+        assert_eq!(old_data_registered, Some(Template::default()));
+
+        let updated = Template {
+            positions: Some(Position { position: (11, 21) }),
+            ..Default::default()
+        };
+
+        let removed_data = world.register(id, updated)?;
+        assert_eq!(
+            removed_data,
+            Some(Template {
+                positions: Some(Position { position: (10, 20) }),
+                ..Default::default()
+            })
+        );
 
         Ok(())
     }

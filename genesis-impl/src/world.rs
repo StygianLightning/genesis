@@ -155,26 +155,62 @@ fn generate_register_impls(input: &Input) -> TokenStream {
             }
         }
     });
+    let component_enum_register_impl = {
+        let component_enum = &input.component_enum_name;
+        let component_enum_match_impl_register = input.components.iter().map(|c| {
+            let ty = &c.field.ty;
 
-    let component_enum = &input.component_enum_name;
-    let component_enum_match_impl_register = input.components.iter().map(|c| {
-        let ty = &c.field.ty;
+            quote! {
+                #component_enum::#ty(c) => self.register(id, c)?.map(|c| c.into()),
+            }
+        });
 
         quote! {
-            #component_enum::#ty(c) => self.register(id, c)?.map(|c| c.into()),
+            impl ::genesis::Register<#component_enum> for #world {
+                fn register(&mut self, id: ::genesis::Entity, component: #component_enum)
+                -> ::std::result::Result<::std::option::Option::<#component_enum>, ::genesis::NoSuchEntity> {
+                Ok(match component {
+                #(#component_enum_match_impl_register)*
+                })
+                }
+            }
         }
-    });
+    };
+
+    let template_register_impl = {
+        let template_fields_register = input.components.iter().map(|c| {
+            let name = &c.field.ident;
+
+            quote! {
+                #name: if let Some(#name) = template.#name {
+                    self.register(id, #name)?
+                } else {
+                    None
+                },
+            }
+        });
+
+        let template_name = &input.template_name;
+
+        quote! {
+            impl ::genesis::Register<#template_name> for #world {
+                fn register(&mut self, id: ::genesis::Entity, template: #template_name)
+                    -> ::std::result::Result<::std::option::Option::<#template_name>, ::genesis::NoSuchEntity> {
+                    Ok(Some(
+                        Template {
+                            #(#template_fields_register)*
+                        }
+                    ))
+                }
+            }
+        }
+    };
 
     quote! {
         #(#register_impls)*
 
-        impl ::genesis::Register<#component_enum> for #world {
-            fn register(&mut self, id: ::genesis::Entity, component: #component_enum)
-                -> ::std::result::Result<::std::option::Option::<#component_enum>, ::genesis::NoSuchEntity> {
-                Ok(match component {
-                    #(#component_enum_match_impl_register)*
-                })
-            }
-        }
+        #component_enum_register_impl
+
+        #template_register_impl
     }
 }
