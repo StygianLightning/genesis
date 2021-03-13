@@ -3,7 +3,6 @@
 
 mod component;
 mod input;
-mod template;
 mod world;
 
 use input::*;
@@ -20,12 +19,10 @@ pub fn world(args: TokenStream, input: TokenStream) -> TokenStream {
 
 fn generate_code(args: InputArgs, input: DeriveInput) -> Result<TokenStream> {
     let input = Input::new(args, &input)?;
-    let template_code = template::generate_code(&input);
     let component_code = component::generate_code(&input);
     let world_code = world::generate_code(&input);
 
     let output = quote! {
-        #template_code
         #component_code
         #world_code
     };

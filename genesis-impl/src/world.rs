@@ -177,40 +177,9 @@ fn generate_register_impls(input: &Input) -> TokenStream {
         }
     };
 
-    let template_register_impl = {
-        let template_fields_register = input.components.iter().map(|c| {
-            let name = &c.field.ident;
-
-            quote! {
-                #name: if let Some(#name) = template.#name {
-                    self.register(id, #name)?
-                } else {
-                    None
-                },
-            }
-        });
-
-        let template_name = &input.template_name;
-
-        quote! {
-            impl ::genesis::Register<#template_name> for #world {
-                fn register(&mut self, id: ::genesis::Entity, template: #template_name)
-                    -> ::std::result::Result<::std::option::Option::<#template_name>, ::genesis::NoSuchEntity> {
-                    Ok(Some(
-                        Template {
-                            #(#template_fields_register)*
-                        }
-                    ))
-                }
-            }
-        }
-    };
-
     quote! {
         #(#register_impls)*
 
         #component_enum_register_impl
-
-        #template_register_impl
     }
 }
