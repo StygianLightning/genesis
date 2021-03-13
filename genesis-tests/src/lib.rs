@@ -1,23 +1,23 @@
 use genesis::*;
 
 #[derive(Clone, Debug, Eq, PartialEq)]
-struct Position {
-    position: (u32, u32),
+pub struct Position {
+    pub position: (u32, u32),
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
-struct NameComponent {
-    name: String,
+pub struct NameComponent {
+    pub name: String,
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
-struct RareComponent {
-    data: u32,
+pub struct RareComponent {
+    pub data: u32,
 }
 
 #[world(World, MyComponent)]
 #[derive(Clone, Debug, Eq, PartialEq)]
-struct Template {
+pub struct Template {
     #[component(vec)] //default, optional
     positions: Position,
     names: NameComponent,
@@ -80,6 +80,12 @@ mod tests {
                 name: String::from("C")
             })
         );
+
+        for id in world.entities.read().unwrap().iter() {
+            if let Some(name) = world.names.get(id) {
+                println!("Name: {:?}", name);
+            }
+        }
 
         world.positions.remove(id_a)?;
         assert_eq!(world.positions.get(id_a), None);

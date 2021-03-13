@@ -50,7 +50,7 @@ fn generate_struct_definition(input: &Input) -> TokenStream {
 
     quote! {
         #vis struct #world {
-            entities: ::std::sync::Arc<::std::sync::RwLock<::genesis::Entities>>,
+            #vis entities: ::std::sync::Arc<::std::sync::RwLock<::genesis::Entities>>,
             #(#vis #world_fields)*
         }
     }
