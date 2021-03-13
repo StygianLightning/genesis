@@ -99,6 +99,14 @@ impl Entities {
         }
         Err(NoSuchEntity)
     }
+
+    pub fn clear(&mut self) {
+        for id in &mut self.ids {
+            if let EntityIDEntry::Used(generation) = id {
+                *id = EntityIDEntry::Unused(generation.wrapping_add(1));
+            }
+        }
+    }
 }
 
 #[cfg(test)]

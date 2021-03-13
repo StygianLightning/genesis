@@ -5,7 +5,7 @@ description = "proc macro crate for genesis"
 authors = ["StygianLightning <denrellum@gmail.com>"]
 edition = "2018"
 license = "MIT OR Apache-2.0"
-repository = "https://github.com/StygianLightning/genesis/genesis-impl"
+repository = "https://github.com/StygianLightning/genesis"
 keywords = ["ecs", "entity", "macro"]
 
 [lib]
