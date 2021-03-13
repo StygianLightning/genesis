@@ -28,7 +28,7 @@ mod tests {
     struct MapTestData(i32);
 
     struct World {
-        entities: Arc<RwLock<Entities>>,
+        pub entities: Arc<RwLock<Entities>>,
         pub vec: VecStorage<VecTestData>,
         pub map: MapStorage<MapTestData>,
     }

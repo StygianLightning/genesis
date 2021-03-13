@@ -1,6 +1,7 @@
 use crate::no_such_entity::NoSuchEntity;
 use serde::{Deserialize, Serialize};
 
+/// An entity.
 #[derive(Eq, PartialEq, Debug, Clone, Copy, Hash, Serialize, Deserialize)]
 pub struct Entity {
     pub index: u32,
@@ -28,18 +29,21 @@ impl EntityIDEntry {
     }
 }
 
+/// A collection of entities.
 #[derive(Debug)]
 pub struct Entities {
     ids: Vec<EntityIDEntry>,
 }
 
 impl Entities {
+    /// Allocate a set of entities with the given initial capacity.
     pub fn new(capacity: u32) -> Self {
         let mut vec = vec![];
         vec.resize(capacity as usize, EntityIDEntry::Unused(0));
         Self { ids: vec }
     }
 
+    /// Spawn a new entity. This will grow the collection if necessary.
     pub fn spawn(&mut self) -> Entity {
         if let Some(index) = self.ids.iter().position(|id| id.is_unused()) {
             match self.ids[index] {
@@ -65,6 +69,7 @@ impl Entities {
         }
     }
 
+    /// Iterate over all existing entities.
     pub fn iter(&self) -> impl Iterator<Item = Entity> + '_ {
         self.ids
             .iter()
@@ -78,6 +83,7 @@ impl Entities {
             })
     }
 
+    /// Check if an entity exists.
     pub fn exists(&self, id: Entity) -> bool {
         if let Some(entry) = self.ids.get(id.index as usize) {
             match entry {
@@ -100,6 +106,7 @@ impl Entities {
         Err(NoSuchEntity)
     }
 
+    /// Remove all entities.
     pub fn clear(&mut self) {
         for id in &mut self.ids {
             if let EntityIDEntry::Used(generation) = id {

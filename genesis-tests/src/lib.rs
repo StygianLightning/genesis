@@ -42,56 +42,56 @@ mod tests {
     #[test]
     fn use_world() -> Result<(), NoSuchEntity> {
         let mut world = World::new(3);
-        let id_a = world.spawn();
-        world.register(id_a, Position { position: (1, 2) })?;
+        let entity_a = world.spawn();
+        world.register(entity_a, Position { position: (1, 2) })?;
 
-        let id_b = world.spawn();
+        let entity_b = world.spawn();
         world.register(
-            id_b,
+            entity_b,
             NameComponent {
                 name: String::from("B"),
             },
         )?;
 
-        let id_c = world.spawn();
-        world.register(id_c, RareComponent { data: 69 })?;
+        let entity_c = world.spawn();
+        world.register(entity_c, RareComponent { data: 69 })?;
         world.register(
-            id_c,
+            entity_c,
             NameComponent {
                 name: String::from("C"),
             },
         )?;
 
         assert_eq!(
-            world.positions.get(id_a),
+            world.positions.get(entity_a),
             Some(&Position { position: (1, 2) })
         );
 
-        assert_eq!(world.names.get(id_a), None);
+        assert_eq!(world.names.get(entity_a), None);
         assert_eq!(
-            world.names.get(id_b),
+            world.names.get(entity_b),
             Some(&NameComponent {
                 name: String::from("B")
             })
         );
         assert_eq!(
-            world.names.get(id_c),
+            world.names.get(entity_c),
             Some(&NameComponent {
                 name: String::from("C")
             })
         );
 
-        for id in world.entities.read().unwrap().iter() {
-            if let Some(name) = world.names.get(id) {
+        for entity in world.entities.read().unwrap().iter() {
+            if let Some(name) = world.names.get(entity) {
                 println!("Name: {:?}", name);
             }
         }
 
-        world.positions.remove(id_a)?;
-        assert_eq!(world.positions.get(id_a), None);
+        world.positions.remove(entity_a)?;
+        assert_eq!(world.positions.get(entity_a), None);
 
         world.clear();
-        assert_eq!(world.names.get(id_b), None);
+        assert_eq!(world.names.get(entity_b), None);
 
         Ok(())
     }
