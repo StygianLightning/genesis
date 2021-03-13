@@ -1,0 +1,7 @@
+[package]
+name = "genesis-tests"
+version = "0.1.0"
+authors = ["StygianLightning <denrellum@gmail.com>"]
+edition = "2018"
+
+[dependencies]

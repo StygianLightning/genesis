@@ -1,0 +1,17 @@
+[package]
+name = "genesis-impl"
+version = "0.1.0"
+description = "proc macro crate for genesis"
+authors = ["StygianLightning <denrellum@gmail.com>"]
+edition = "2018"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/StygianLightning/genesis/genesis-impl"
+keywords = ["ecs", "entity", "macro"]
+
+[lib]
+proc-macro = true
+
+[dependencies]
+syn = { version = "1.0", features = ["extra-traits"] }
+quote = "1.0"
+proc-macro2 = "1.0"
