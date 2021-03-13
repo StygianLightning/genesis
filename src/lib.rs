@@ -1,3 +1,6 @@
+#![deny(rust_2018_idioms)]
+#![deny(clippy::all)]
+
 mod entity;
 mod mapstorage;
 mod no_such_entity;
