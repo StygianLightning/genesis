@@ -51,6 +51,14 @@ impl<T> MapStorage<T> {
         }
     }
 
+    pub fn remove_unchecked(&mut self, id: Entity) -> Option<T> {
+        if let Some(entry) = self.map.get_mut(&id.index) {
+            entry.take()
+        } else {
+            None
+        }
+    }
+
     pub fn remove(&mut self, id: Entity) -> Result<Option<T>, NoSuchEntity> {
         let lock = self.entities.read().unwrap();
         if lock.exists(id) {
