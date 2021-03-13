@@ -1,4 +1,5 @@
 mod entity;
+mod mapstorage;
 mod no_such_entity;
 mod register;
 mod vecstorage;
