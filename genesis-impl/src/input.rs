@@ -1,11 +1,11 @@
-
-
 use syn::parse::{Parse, ParseStream};
 use syn::spanned::Spanned;
-use syn::{Attribute};
+use syn::Attribute;
+use syn::Token;
 use syn::{Data, DataStruct, DeriveInput, Field, Ident, Result, Visibility};
 
 pub(crate) struct Input {
+    pub template_name: Ident,
     pub world_name: Ident,
     pub component_enum_name: Ident,
     pub components: Vec<WorldComponent>,
@@ -14,13 +14,18 @@ pub(crate) struct Input {
 }
 
 pub struct InputArgs {
+    pub world_name: Ident,
     pub component_name: Ident,
 }
 
 impl Parse for InputArgs {
     fn parse(input: ParseStream<'_>) -> Result<Self> {
+        let world_name = input.parse::<Ident>()?;
+        let _separator = input.parse::<Token![,]>()?;
+        let component_name = input.parse::<Ident>()?;
         Ok(Self {
-            component_name: input.parse::<Ident>()?,
+            world_name,
+            component_name,
         })
     }
 }
@@ -86,7 +91,8 @@ impl Input {
                     })
                     .collect();
                 Ok(Self {
-                    world_name: input.ident.clone(),
+                    template_name: input.ident.clone(),
+                    world_name: args.world_name,
                     component_enum_name: args.component_name,
                     components: fields,
                     vis: input.vis.clone(),
