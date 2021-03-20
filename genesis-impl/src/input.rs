@@ -5,27 +5,27 @@ use syn::Token;
 use syn::{Data, DataStruct, DeriveInput, Field, Ident, Result, Visibility};
 
 pub(crate) struct Input {
-    pub template_name: Ident,
     pub world_name: Ident,
     pub component_enum_name: Ident,
+    pub template_name: Ident,
     pub components: Vec<WorldComponent>,
     pub vis: Visibility,
     pub attributes: Vec<Attribute>,
 }
 
 pub struct InputArgs {
-    pub world_name: Ident,
     pub component_name: Ident,
+    pub template_name: Ident,
 }
 
 impl Parse for InputArgs {
     fn parse(input: ParseStream<'_>) -> Result<Self> {
-        let world_name = input.parse::<Ident>()?;
-        let _separator = input.parse::<Token![,]>()?;
         let component_name = input.parse::<Ident>()?;
+        let _separator = input.parse::<Token![,]>()?;
+        let template_name = input.parse::<Ident>()?;
         Ok(Self {
-            world_name,
             component_name,
+            template_name,
         })
     }
 }
@@ -91,8 +91,8 @@ impl Input {
                     })
                     .collect();
                 Ok(Self {
-                    template_name: input.ident.clone(),
-                    world_name: args.world_name,
+                    world_name: input.ident.clone(),
+                    template_name: args.template_name,
                     component_enum_name: args.component_name,
                     components: fields,
                     vis: input.vis.clone(),

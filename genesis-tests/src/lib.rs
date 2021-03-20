@@ -15,9 +15,9 @@ pub struct RareComponent {
     pub data: u32,
 }
 
-#[world(World, MyComponent)]
+#[world(MyComponent, MyEntityTemplate)]
 #[derive(Clone, Debug, Eq, PartialEq)]
-pub struct Template {
+pub struct World {
     #[component(vec)] //default, optional
     positions: Position,
     names: NameComponent,
@@ -101,7 +101,7 @@ mod tests {
         let mut world = World::new(3);
         let id = world.spawn();
 
-        let template = Template {
+        let template = MyEntityTemplate {
             positions: Some(Position { position: (10, 20) }),
             rare_data: Some(RareComponent { data: 42 }),
             ..Default::default()
@@ -112,7 +112,7 @@ mod tests {
 
         assert_eq!(
             template,
-            Template {
+            MyEntityTemplate {
                 positions: Some(Position { position: (10, 20) }),
                 names: None,
                 rare_data: Some(RareComponent { data: 42 }),
@@ -120,9 +120,9 @@ mod tests {
         );
 
         let old_data_registered = world.register(id, template)?;
-        assert_eq!(old_data_registered, Some(Template::default()));
+        assert_eq!(old_data_registered, Some(MyEntityTemplate::default()));
 
-        let updated = Template {
+        let updated = MyEntityTemplate {
             positions: Some(Position { position: (11, 21) }),
             ..Default::default()
         };
@@ -130,7 +130,7 @@ mod tests {
         let removed_data = world.register(id, updated)?;
         assert_eq!(
             removed_data,
-            Some(Template {
+            Some(MyEntityTemplate {
                 positions: Some(Position { position: (10, 20) }),
                 ..Default::default()
             })

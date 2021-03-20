@@ -29,9 +29,9 @@ struct RareComponent {
     data: u32,
 }
 
-#[world(World, MyComponent)]
+#[world(MyComponent, Template)]
 #[derive(Clone, Debug, Eq, PartialEq)]
-struct Template {
+struct World {
     #[component(vec)] //default, optional
     indices: IndexComponent,
     names: NameComponent,

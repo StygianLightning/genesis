@@ -197,7 +197,7 @@ fn generate_register_impls(input: &Input) -> TokenStream {
                 fn register(&mut self, id: ::genesis::Entity, template: #template_name)
                     -> ::std::result::Result<::std::option::Option::<#template_name>, ::genesis::NoSuchEntity> {
                     Ok(Some(
-                        Template {
+                        #template_name {
                             #(#template_fields_register)*
                         }
                     ))
