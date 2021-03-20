@@ -30,6 +30,15 @@ use syn::{parse_macro_input, DeriveInput, Result};
 /// When spawning entities in a batch, direct access is recommended to avoid re-acquiring the write
 /// lock over and over.
 ///
+/// In addition to the component enum, this macro generates a "template" for an entity;
+/// this template has one public field of type `Option<T>` for every component and can be used
+/// to set the corresponding components on an entity.
+///
+/// Attribute macros like `#[derive(Debug)]` are applied to both the component enum and the
+/// template struct. This can be very useful for debugging and provides a quick and simple way
+/// to define entities in data files and using e.g. serde to deserialize them into the generated
+/// Template struct.
+///
 /// # Example
 /// ```ignore
 /// #[derive(Clone, Debug, Eq, PartialEq)]
@@ -47,9 +56,9 @@ use syn::{parse_macro_input, DeriveInput, Result};
 ///     pub data: u32,
 /// }
 ///
-/// #[world(World, MyComponent)]
+/// #[world(MyComponent, Template)]
 /// #[derive(Clone, Debug, Eq, PartialEq)]
-/// pub struct Template {
+/// pub struct World {
 ///     #[component(vec)] //default, optional
 ///     positions: Position,
 ///     names: NameComponent,
