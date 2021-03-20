@@ -1,6 +1,6 @@
 [package]
 name = "genesis"
-version = "0.1.1"
+version = "0.2.0"
 description = "A library for generating statically-typed ECS worlds."
 authors = ["StygianLightning <denrellum@gmail.com>"]
 edition = "2018"
@@ -14,7 +14,7 @@ members = [
 ]
 
 [dependencies]
-genesis-impl = { path = "genesis-impl", version = "0.1.0" }
+genesis-impl = { path = "genesis-impl", version = "0.2.0" }
 serde = { version = "1.0", features = ["derive"]}
 thiserror = "1.0"
 
