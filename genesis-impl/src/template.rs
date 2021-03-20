@@ -22,7 +22,7 @@ pub(crate) fn generate_code(input: &Input) -> TokenStream {
 fn generate_template_definition(input: &Input) -> TokenStream {
     let template_fields = input.components.iter().map(|c| {
         let ty = &c.field.ty;
-        let name = &c.field.ident;
+        let name = &c.template_name;
         quote! {
             #name: ::std::option::Option<#ty>,
         }

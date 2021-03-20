@@ -19,7 +19,9 @@ struct RareComponent {
 #[derive(Clone, Debug, Eq, PartialEq)]
 struct World {
     #[component(vec)] //default, optional
+    #[template_name(index)]
     indices: IndexComponent,
+    #[template_name(name)]
     names: NameComponent,
     #[component(map)]
     rare_data: RareComponent,
@@ -33,11 +35,20 @@ fn main() -> Result<(), NoSuchEntity> {
     world.indices.set(id_a, IndexComponent { index: 42 })?;
 
     let id_b = world.spawn();
-    world.indices.set(id_b, IndexComponent { index: 0 })?;
-    world.names.set(
+    world.register(id_b, IndexComponent { index: 0 })?;
+    world.register(
         id_b,
         NameComponent {
             name: String::from("B"),
+        },
+    )?;
+
+    let id_c = world.spawn();
+    world.register(
+        id_c,
+        Template {
+            index: Some(IndexComponent { index: 100 }),
+            ..Default::default()
         },
     )?;
 

@@ -32,6 +32,7 @@ impl Parse for InputArgs {
 
 pub(crate) struct WorldComponent {
     pub field: Field,
+    pub template_name: Ident,
     pub storage_type: ComponentStorageType,
 }
 
@@ -70,6 +71,21 @@ impl Parse for ComponentStorageType {
     }
 }
 
+pub(crate) struct TemplateName {
+    pub ident: Ident,
+}
+
+impl Parse for TemplateName {
+    fn parse(input: ParseStream<'_>) -> Result<Self> {
+        let inner;
+        syn::parenthesized!(inner in input);
+
+        let ident = inner.parse::<Ident>()?;
+
+        Ok(Self { ident })
+    }
+}
+
 const EXPECTED_NAMED_STRUCT_FIELDS: &'static str = "Only structs with named fields are supported.";
 
 impl Input {
@@ -83,10 +99,11 @@ impl Input {
                     .named
                     .iter()
                     .map(|f| {
-                        let ty = get_field_storage_type(f);
+                        let (ty, name) = get_field_storage_type_and_template_name(f);
                         WorldComponent {
                             field: f.clone(),
                             storage_type: ty,
+                            template_name: name,
                         }
                     })
                     .collect();
@@ -114,15 +131,22 @@ impl Input {
     }
 }
 
-fn get_field_storage_type(f: &Field) -> ComponentStorageType {
+fn get_field_storage_type_and_template_name(f: &Field) -> (ComponentStorageType, Ident) {
+    let mut component_type = ComponentStorageType::Vec;
+    let mut template_name = f.ident.as_ref().unwrap().clone();
     for attr in f.attrs.iter() {
         let path_ident = attr.path.get_ident();
         if path_ident.is_some() && path_ident.unwrap() == "component" {
             let tokens = attr.tokens.clone();
             if let Ok(ty) = syn::parse2::<ComponentStorageType>(tokens) {
-                return ty;
+                component_type = ty;
+            }
+        } else if path_ident.is_some() && path_ident.unwrap() == "template_name" {
+            let tokens = attr.tokens.clone();
+            if let Ok(name) = syn::parse2::<TemplateName>(tokens) {
+                template_name = name.ident;
             }
         }
     }
-    ComponentStorageType::Vec
+    (component_type, template_name)
 }

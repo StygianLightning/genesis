@@ -32,7 +32,8 @@ use syn::{parse_macro_input, DeriveInput, Result};
 ///
 /// In addition to the component enum, this macro generates a "template" for an entity;
 /// this template has one public field of type `Option<T>` for every component and can be used
-/// to set the corresponding components on an entity.
+/// to set the corresponding components on an entity. The name of these fields defaults to the name of the
+/// field in the World definition and can be customized via `#[template_name(name)]`.
 ///
 /// Attribute macros like `#[derive(Debug)]` are applied to both the component enum and the
 /// template struct. This can be very useful for debugging and provides a quick and simple way

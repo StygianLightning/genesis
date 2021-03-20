@@ -179,7 +179,7 @@ fn generate_register_impls(input: &Input) -> TokenStream {
 
     let template_register_impl = {
         let template_fields_register = input.components.iter().map(|c| {
-            let name = &c.field.ident;
+            let name = &c.template_name;
 
             quote! {
                 #name: if let Some(#name) = template.#name {
