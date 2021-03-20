@@ -31,10 +31,14 @@ fn main() -> Result<(), NoSuchEntity> {
     let initial_capacity = 1024;
     let mut world = World::new(initial_capacity);
 
+    // spawn an entity
     let id_a = world.spawn();
+    // set the components directly on the corresponding storage
     world.indices.set(id_a, IndexComponent { index: 42 })?;
 
+    // spawn another entity
     let id_b = world.spawn();
+    // alternative way to set components: using the utility trait Register<T>.
     world.register(id_b, IndexComponent { index: 0 })?;
     world.register(
         id_b,
@@ -44,6 +48,7 @@ fn main() -> Result<(), NoSuchEntity> {
     )?;
 
     let id_c = world.spawn();
+    // third way of setting components: using the generated Template struct.
     world.register(
         id_c,
         Template {

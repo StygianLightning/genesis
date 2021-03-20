@@ -33,7 +33,9 @@ struct RareComponent {
 #[derive(Clone, Debug, Eq, PartialEq)]
 struct World {
     #[component(vec)] //default, optional
+    #[template_name(index)]
     indices: IndexComponent,
+    #[template_name(name)]
     names: NameComponent,
     #[component(map)]
     rare_data: RareComponent,
@@ -43,15 +45,29 @@ fn main() -> Result<(), NoSuchEntity> {
     let initial_capacity = 1024;
     let mut world = World::new(initial_capacity);
 
+    // spawn an entity
     let id_a = world.spawn();
+    // set the components directly on the corresponding storage
     world.indices.set(id_a, IndexComponent { index: 42 })?;
 
+    // spawn another entity
     let id_b = world.spawn();
-    world.indices.set(id_b, IndexComponent { index: 0 })?;
-    world.names.set(
+    // alternative way to set components: using the utility trait Register<T>.
+    world.register(id_b, IndexComponent { index: 0 })?;
+    world.register(
         id_b,
         NameComponent {
             name: String::from("B"),
+        },
+    )?;
+
+    let id_c = world.spawn();
+    // third way of setting components: using the generated Template struct.
+    world.register(
+        id_c,
+        Template {
+            index: Some(IndexComponent { index: 100 }),
+            ..Default::default()
         },
     )?;
 
