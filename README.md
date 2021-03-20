@@ -1,5 +1,8 @@
 # Genesis - an ECS generator library 
 
+[![Documentation](https://docs.rs/genesis/badge.svg)](https://docs.rs/genesis/)
+[![Crates.io](https://img.shields.io/crates/v/genesis.svg)](https://crates.io/crates/genesis)
+
 ## Overview 
 
 `genesis` provides an ECS-generating macro.  
