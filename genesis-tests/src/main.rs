@@ -1,30 +1,30 @@
 use genesis::*;
 
 #[derive(Clone, Debug, Eq, PartialEq)]
-struct IndexComponent {
-    index: usize,
+pub struct IndexComponent {
+    pub index: usize,
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
-struct NameComponent {
-    name: String,
+pub struct NameComponent {
+    pub name: String,
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
-struct RareComponent {
-    data: u32,
+pub struct RareComponent {
+    pub data: u32,
 }
 
 #[world(MyComponent, Template)]
 #[derive(Clone, Debug, Eq, PartialEq)]
-struct World {
+pub struct World {
     #[component(vec)] //default, optional
     #[template_name(index)]
-    indices: IndexComponent,
+    pub indices: IndexComponent,
     #[template_name(name)]
-    names: NameComponent,
+    pub names: NameComponent,
     #[component(map)]
-    rare_data: RareComponent,
+    pub rare_data: RareComponent,
 }
 
 fn main() -> Result<(), NoSuchEntity> {
