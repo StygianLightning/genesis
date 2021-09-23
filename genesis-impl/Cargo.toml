@@ -1,6 +1,6 @@
 [package]
 name = "genesis-impl"
-version = "0.2.0"
+version = "0.2.2"
 description = "proc macro crate for genesis"
 authors = ["StygianLightning <denrellum@gmail.com>"]
 edition = "2018"
