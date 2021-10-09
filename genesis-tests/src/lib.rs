@@ -18,13 +18,11 @@ pub struct RareComponent {
 #[world(MyComponent, MyEntityTemplate)]
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct World {
-    #[component(vec)] //default, optional
     #[template_name(position)]
-    positions: Position,
+    positions: VecStorage<Position>,
     #[template_name(name)]
-    names: NameComponent,
-    #[component(map)]
-    rare_data: RareComponent,
+    names: VecStorage<NameComponent>,
+    rare_data: MapStorage<RareComponent>,
 }
 
 #[cfg(test)]

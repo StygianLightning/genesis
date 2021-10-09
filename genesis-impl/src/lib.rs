@@ -60,11 +60,9 @@ use syn::{parse_macro_input, DeriveInput, Result};
 /// #[world(MyComponent, Template)]
 /// #[derive(Clone, Debug, Eq, PartialEq)]
 /// pub struct World {
-///     #[component(vec)] //default, optional
-///     positions: Position,
-///     names: NameComponent,
-///     #[component(map)]
-///     rare_data: RareComponent,
+///     positions: VecStorage<Position>,
+///     names: VecStorage<NameComponent>,
+///     rare_data: MapStorage<RareComponent>,
 /// }
 /// ```
 #[proc_macro_attribute]

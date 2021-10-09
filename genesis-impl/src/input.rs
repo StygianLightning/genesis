@@ -2,7 +2,10 @@ use syn::parse::{Parse, ParseStream};
 use syn::spanned::Spanned;
 use syn::Attribute;
 use syn::Token;
-use syn::{Data, DataStruct, DeriveInput, Field, Ident, Result, Visibility};
+use syn::{
+    AngleBracketedGenericArguments, Data, DataStruct, DeriveInput, Field, GenericArgument, Ident,
+    Path, PathArguments, Result, Type, TypePath, Visibility,
+};
 
 pub(crate) struct Input {
     pub world_name: Ident,
@@ -30,10 +33,12 @@ impl Parse for InputArgs {
     }
 }
 
+#[derive(Debug)]
 pub(crate) struct WorldComponent {
-    pub field: Field,
     pub template_name: Ident,
     pub storage_type: ComponentStorageType,
+    pub component_type: Type,
+    pub field_name: Ident,
 }
 
 #[derive(Debug, Copy, Clone)]
@@ -47,27 +52,6 @@ impl ComponentStorageType {
         match self {
             ComponentStorageType::Vec => "VecStorage",
             ComponentStorageType::Map => "MapStorage",
-        }
-    }
-}
-
-impl Default for ComponentStorageType {
-    fn default() -> Self {
-        ComponentStorageType::Vec
-    }
-}
-
-impl Parse for ComponentStorageType {
-    fn parse(input: ParseStream<'_>) -> Result<Self> {
-        let inner;
-        syn::parenthesized!(inner in input);
-
-        let ident = inner.parse::<Ident>()?.to_string();
-
-        if ident == "map" {
-            Ok(Self::Map)
-        } else {
-            Ok(Self::Vec)
         }
     }
 }
@@ -99,14 +83,7 @@ impl Input {
                 let fields = fields_named
                     .named
                     .iter()
-                    .map(|f| {
-                        let (ty, name) = get_field_storage_type_and_template_name(f);
-                        WorldComponent {
-                            field: f.clone(),
-                            storage_type: ty,
-                            template_name: name,
-                        }
-                    })
+                    .map(|f| world_component(f))
                     .collect();
                 Ok(Self {
                     world_name: input.ident.clone(),
@@ -132,22 +109,50 @@ impl Input {
     }
 }
 
-fn get_field_storage_type_and_template_name(f: &Field) -> (ComponentStorageType, Ident) {
-    let mut component_type = ComponentStorageType::Vec;
+fn world_component(f: &Field) -> WorldComponent {
     let mut template_name = f.ident.as_ref().unwrap().clone();
     for attr in f.attrs.iter() {
         let path_ident = attr.path.get_ident();
-        if path_ident.is_some() && path_ident.unwrap() == "component" {
-            let tokens = attr.tokens.clone();
-            if let Ok(ty) = syn::parse2::<ComponentStorageType>(tokens) {
-                component_type = ty;
-            }
-        } else if path_ident.is_some() && path_ident.unwrap() == "template_name" {
+        if path_ident.is_some() && path_ident.unwrap() == "template_name" {
             let tokens = attr.tokens.clone();
             if let Ok(name) = syn::parse2::<TemplateName>(tokens) {
                 template_name = name.ident;
             }
         }
     }
-    (component_type, template_name)
+    let (component_type, storage_type) = get_inner_type(f, "VecStorage")
+        .map(|t| (t.clone(), ComponentStorageType::Vec))
+        .or_else(|| get_inner_type(f, "MapStorage").map(|t| (t.clone(), ComponentStorageType::Map)))
+        .expect("World components must be wrapped in VecStorage or MapStorage");
+
+    WorldComponent {
+        field_name: f.ident.clone().unwrap(),
+        storage_type,
+        template_name,
+        component_type,
+    }
+}
+
+fn get_inner_type<'a, 'b>(field: &'a Field, name: &'b str) -> Option<&'a Type> {
+    match &field.ty {
+        Type::Path(TypePath {
+            qself: None,
+            path: Path { segments, .. },
+        }) if segments.first().is_some() => {
+            let first_segment = segments.first().unwrap();
+            if first_segment.ident == name {
+                if let PathArguments::AngleBracketed(AngleBracketedGenericArguments {
+                    args, ..
+                }) = &first_segment.arguments
+                {
+                    if let Some(GenericArgument::Type(inner_type)) = args.first() {
+                        return Some(inner_type);
+                    }
+                }
+            }
+
+            None
+        }
+        _ => None,
+    }
 }

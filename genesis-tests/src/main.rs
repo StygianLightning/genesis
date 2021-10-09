@@ -18,13 +18,11 @@ pub struct RareComponent {
 #[world(MyComponent, Template)]
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct World {
-    #[component(vec)] //default, optional
     #[template_name(index)]
-    pub indices: IndexComponent,
+    pub indices: VecStorage<IndexComponent>,
     #[template_name(name)]
-    pub names: NameComponent,
-    #[component(map)]
-    pub rare_data: RareComponent,
+    pub names: VecStorage<NameComponent>,
+    pub rare_data: VecStorage<RareComponent>,
 }
 
 fn main() -> Result<(), NoSuchEntity> {

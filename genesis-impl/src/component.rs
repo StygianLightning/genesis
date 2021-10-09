@@ -23,7 +23,7 @@ pub(crate) fn generate_code(input: &Input) -> TokenStream {
 
 fn generate_enum_definition(input: &Input) -> TokenStream {
     let component_fields = input.components.iter().map(|c| {
-        let ty = &c.field.ty;
+        let ty = &c.component_type;
         quote! {
             #ty(#ty),
         }
@@ -42,7 +42,7 @@ fn generate_enum_definition(input: &Input) -> TokenStream {
 fn generate_from_impls(input: &Input) -> TokenStream {
     let component_enum = &input.component_enum_name;
     let from_impls = input.components.iter().map(|c| {
-        let ty = &c.field.ty;
+        let ty = &c.component_type;
         quote! {
             impl From<#ty> for #component_enum {
                 fn from(component: #ty) -> Self {
