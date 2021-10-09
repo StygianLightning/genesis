@@ -41,6 +41,7 @@ pub(crate) enum ComponentStorageType {
     Vec,
     Map,
 }
+
 impl ComponentStorageType {
     pub(crate) fn name(self) -> &'static str {
         match self {
@@ -86,7 +87,7 @@ impl Parse for TemplateName {
     }
 }
 
-const EXPECTED_NAMED_STRUCT_FIELDS: &'static str = "Only structs with named fields are supported.";
+const EXPECTED_NAMED_STRUCT_FIELDS: &str = "Only structs with named fields are supported.";
 
 impl Input {
     pub(crate) fn new(args: InputArgs, input: &DeriveInput) -> Result<Self> {
