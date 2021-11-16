@@ -8,7 +8,7 @@ use std::sync::{Arc, RwLock};
 /// A storage type based on a HashMap, intended for sparsely used components.
 #[derive(Debug)]
 pub struct MapStorage<T> {
-    map: HashMap<u32, Option<T>>,
+    map: HashMap<u32, T>,
     entities: Arc<RwLock<Entities>>,
 }
 
@@ -25,7 +25,7 @@ impl<T> MapStorage<T> {
     pub fn get(&self, entity: Entity) -> Option<&T> {
         let lock = self.entities.read().unwrap();
         if lock.exists(entity) {
-            self.map.get(&entity.index).unwrap_or(&None).as_ref()
+            self.map.get(&entity.index)
         } else {
             None
         }
@@ -35,11 +35,7 @@ impl<T> MapStorage<T> {
     pub fn get_mut(&mut self, entity: Entity) -> Option<&mut T> {
         let lock = self.entities.read().unwrap();
         if lock.exists(entity) {
-            if let Some(entry) = self.map.get_mut(&entity.index) {
-                entry.as_mut()
-            } else {
-                None
-            }
+            self.map.get_mut(&entity.index)
         } else {
             None
         }
@@ -51,8 +47,7 @@ impl<T> MapStorage<T> {
     pub fn set(&mut self, entity: Entity, data: T) -> Result<Option<T>, NoSuchEntity> {
         let lock = self.entities.read().unwrap();
         if lock.exists(entity) {
-            let entry = self.map.entry(entity.index);
-            Ok(entry.or_default().replace(data))
+            Ok(self.map.insert(entity.index, data))
         } else {
             Err(NoSuchEntity {})
         }
@@ -64,11 +59,7 @@ impl<T> MapStorage<T> {
     /// through invariants in your code or because you retrieved this in a loop iterating
     /// over all alive entities.
     pub fn remove_unchecked(&mut self, entity: Entity) -> Option<T> {
-        if let Some(entry) = self.map.get_mut(&entity.index) {
-            entry.take()
-        } else {
-            None
-        }
+        self.map.remove(&entity.index)
     }
 
     /// Remove the component for the given entity.
@@ -76,11 +67,7 @@ impl<T> MapStorage<T> {
     pub fn remove(&mut self, entity: Entity) -> Result<Option<T>, NoSuchEntity> {
         let lock = self.entities.read().unwrap();
         if lock.exists(entity) {
-            if let Some(entry) = self.map.get_mut(&entity.index) {
-                Ok(entry.take())
-            } else {
-                Ok(None)
-            }
+            Ok(self.map.remove(&entity.index))
         } else {
             Err(NoSuchEntity)
         }
